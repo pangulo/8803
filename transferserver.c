@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
   //bzero(stbuf, BUFSIZE); //clearing buffer
   memset(&stbuf,0, sizeof(stbuf));
   while(n == 0){
-    while((numRead = fread(stbuf, sizeof(char), BUFSIZE, fp))>0){
+    while((numRead = fread(stbuf, sizeof(char), BUFSIZE, fp))) {
       //while bytes read from file returns num byte read >0
         printf("%d\n",numRead);
         printf("%s\n", stbuf);
