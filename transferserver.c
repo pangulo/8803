@@ -115,11 +115,12 @@ int main(int argc, char **argv) {
       //while bytes read from file returns num byte read >0
         printf("%d\n",numRead);
         printf("%s\n", stbuf);
-        send(sockS_new, stbuf, numRead, 0);
+
         if(feof(fp)){
           printf("eof\n");
           printf("%d\n",feof(fp));
           printf("%d\n",shutdown(sockS_new,1));}
+        send(sockS_new, stbuf, numRead, 0);
 
           //shutdown(sockS_new,1);
           //break;
