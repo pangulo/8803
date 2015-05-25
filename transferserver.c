@@ -119,6 +119,11 @@ int main(int argc, char **argv) {
         //  printf("Failed to send file");
         //bzero(stbuf, BUFSIZE);//clear buffer
         memset(&stbuf,0, sizeof(stbuf));
+        if(numRead < 0){
+          break;}
+        else if(numRead == 0){
+          break;}
+
     }
     //printf("ok!\n");
     n = 1;
