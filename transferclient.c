@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     struct hostent *server;
     int sockC;
     char recbuf[BUFSIZE];
-    int numRec;
+    int numRec = 0;
     int n = 0;
     int x;
  
@@ -78,31 +78,33 @@ int main(int argc, char **argv) {
      FILE *fp = fopen(filename,"w");
 
      //       printf("error opening file");
-     memset(&recbuf,0,sizeof(recbuf));
+     
      //printf("test\n");
-     while(n == 0){
-        //numRec = recv(sockC, recbuf, BUFSIZE, 0);
-        //printf("%d\n",numRec);
-        while((numRec = recv(sockC, recbuf, BUFSIZE, 0))){
-       //     printf("%d\n",numRec);
-            //while num of bytes received is > 0
-       //     printf("test3\n");
-       //     printf("%d\n",numRec);
-       //     printf("%s\n", recbuf);
-            fwrite(recbuf, sizeof(char), numRec, fp);
-            //memset(&recbuf,0,sizeof(recbuf));
-       //     printf("%d\n",numRec);
-            //numRec = 0;
-            if(numRec < 0){
-                break;}
-            else if(numRec == 0){
-                break;}
-        }
-        //printf("%d\n",numRec);
-        //printf("ok!\n");
-        n = 1;
-        fclose(fp);
-     }
+     //if(fp =! NULL){
+    //numRec = recv(sockC, recbuf, BUFSIZE, 0);
+    //printf("%d\n",numRec);
+    memset(&recbuf,0,sizeof(recbuf));
+    while((numRec = recv(sockC, recbuf, BUFSIZE, 0))){
+   //     printf("%d\n",numRec);
+        //while num of bytes received is > 0
+   //     printf("test3\n");
+   //     printf("%d\n",numRec);
+   //     printf("%s\n", recbuf);
+        fwrite(recbuf, sizeof(char), numRec, fp);
+        memset(&recbuf,0,sizeof(recbuf));
+        //memset(&recbuf,0,sizeof(recbuf));
+   //     printf("%d\n",numRec);
+        //numRec = 0;
+        if(numRec < 0){
+            break;}
+        else if(numRec == 0){
+            break;}
+    }
+    //printf("%d\n",numRec);
+    //printf("ok!\n");
+    //n = 1;
+    fclose(fp);
+     //}
 close(sockC);
 return 0;
 }
