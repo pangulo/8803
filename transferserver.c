@@ -8,6 +8,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <errno.h>
  
 #if 0
 /* 
@@ -120,6 +121,7 @@ int main(int argc, char **argv) {
           printf("eof\n");
           printf("%d\n",feof(fp));
           printf("%d\n",shutdown(sockS_new,1));}
+        printf("%d\n", errno);
         send(sockS_new, stbuf, numRead, 0);
 
           //shutdown(sockS_new,1);
