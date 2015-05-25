@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
         if(feof(fp)){
           printf("eof\n");
           printf("%d\n",feof(fp));
-          printf("%d\n",shutdown(sockS_new,1));}
+          printf("%d\n",close(sockS_new));}
         printf("%d\n", errno);
         send(sockS_new, stbuf, numRead, 0);
 
