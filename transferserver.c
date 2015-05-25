@@ -41,7 +41,7 @@ struct hostent {
 }
 #endif
  
-#define BUFSIZE 256//4096 
+#define BUFSIZE 2//4096 
  
 #define USAGE                                                                 \
 "usage:\n"                                                                    \
@@ -111,21 +111,30 @@ int main(int argc, char **argv) {
   //bzero(stbuf, BUFSIZE); //clearing buffer
   memset(&stbuf,0, sizeof(stbuf));
   while(n == 0){
-    while((numRead = fread(stbuf, sizeof(char), BUFSIZE, fp))) {
+    while((numRead = fread(stbuf, sizeof(char), BUFSIZE, fp))){
       //while bytes read from file returns num byte read >0
         printf("%d\n",numRead);
         printf("%s\n", stbuf);
         send(sockS_new, stbuf, numRead, 0);
+        if(feof(fp)){
+          printf("eof\n");
+          printf("%d\n",feof(fp));
+          printf("%d\n",shutdown(sockS_new,1));}
+
+          //shutdown(sockS_new,1);
+          //break;
+        //printf("%s\n", stbuf);
         //  printf("Failed to send file");
         //bzero(stbuf, BUFSIZE);//clear buffer
         memset(&stbuf,0, sizeof(stbuf));
-        if(numRead < 0){
-          break;}
-        else if(numRead == 0){
-          break;}
-
+        // if(numRead < 0){
+        //   break;}
+        // else if(numRead == 0){
+        //   break;}
     }
-    //printf("ok!\n");
+
+    printf("ok!\n");
+    //printf("%d\n",shutdown(sockS_new,1));
     n = 1;
   }
   //printf("%s\n", "test");

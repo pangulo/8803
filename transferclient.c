@@ -8,7 +8,7 @@
 #include <netdb.h>
 #include <fcntl.h>
  
-#define BUFSIZE 256 //4096 
+#define BUFSIZE 2 //4096 
  
 #define USAGE                                                                 \
 "usage:\n"                                                                    \
@@ -84,26 +84,34 @@ int main(int argc, char **argv) {
     //numRec = recv(sockC, recbuf, BUFSIZE, 0);
     //printf("%d\n",numRec);
     memset(&recbuf,0,sizeof(recbuf));
+    
+    printf("%d\n",numRec);
     while((numRec = recv(sockC, recbuf, BUFSIZE, 0))){
+        printf("%d\n",numRec);
+        fwrite(recbuf, sizeof(char), numRec, fp);
+        printf("%d\n",numRec);
+        printf("%s", recbuf);
+        memset(&recbuf,0,sizeof(recbuf));
+
    //     printf("%d\n",numRec);
         //while num of bytes received is > 0
    //     printf("test3\n");
    //     printf("%d\n",numRec);
    //     printf("%s\n", recbuf);
-        fwrite(recbuf, sizeof(char), numRec, fp);
-        memset(&recbuf,0,sizeof(recbuf));
+//        fwrite(recbuf, sizeof(char), numRec, fp);
+//        memset(&recbuf,0,sizeof(recbuf));
         //memset(&recbuf,0,sizeof(recbuf));
    //     printf("%d\n",numRec);
         //numRec = 0;
-        if(numRec < 0){
-            break;}
-        else if(numRec == 0){
-            break;}
+        // if(numRec < 0){
+        //     break;}
+        // else if(numRec == 0){
+        //     break;}
     }
     //printf("%d\n",numRec);
-    //printf("ok!\n");
+    printf("ok!\n");
     //n = 1;
-    fclose(fp);
+ //   fclose(fp);
      //}
 close(sockC);
 return 0;
