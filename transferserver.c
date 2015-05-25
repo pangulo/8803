@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
   listen(sockS, 5);
  
   //printf("%s\n","Server running: waiting for connections.");
-  sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
+  //sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
   //  printf("error on accept");
  
   //open file to transfer
@@ -112,6 +112,7 @@ int main(int argc, char **argv) {
   //bzero(stbuf, BUFSIZE); //clearing buffer
   memset(&stbuf,0, sizeof(stbuf));
   while(n == 0){
+    sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
     while((numRead = fread(stbuf, sizeof(char), BUFSIZE, fp))){
       //while bytes read from file returns num byte read >0
         printf("%d\n",numRead);
