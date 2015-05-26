@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
     int sockC;
     char recbuf[BUFSIZE];
     int numRec;
-    int n = 0;
+    int n;
     int enable = 1;
     size_t numWrite, x;
  
@@ -82,21 +82,24 @@ int main(int argc, char **argv) {
     memset(&recbuf,0,sizeof(recbuf));
 
     //while recv bytes, write into file if, numRec is 0 close socket. 
-    fprintf(stdout,"rec bytes before while: %d\n",numRec);
-    while(1){
-        numRec = recv(sockC, recbuf, BUFSIZE, 0);
-        fprintf(stdout,"rec bytes: %d\n",numRec);
-        numWrite = fwrite(recbuf, sizeof(char), numRec, fp);
-        x = x + numWrite;
-        fprintf(stdout, "total written bytes: %zu\n",x);
-        fprintf(stdout, "rec string: %s\n", recbuf);
-        memset(&recbuf,0,sizeof(recbuf));
-        if(numRec == 0){
-            close(sockC);
-            break;}
+    //fprintf(stdout,"rec bytes before while: %d\n",numRec);
+    while(n==0){
+        while(1){
+            fprintf(stdout,"rec bytes begin: %d\n",numRec);
+            numRec = recv(sockC, recbuf, BUFSIZE, 0);
+            if(numRec == 0){
+                break;}
+            fprintf(stdout,"rec bytes after: %d\n",numRec);
+            numWrite = fwrite(recbuf, sizeof(char), numRec, fp);
+            x = x + numWrite;
+            fprintf(stdout, "total written bytes: %zu\n",x);
+            fprintf(stdout, "rec string: %s\n", recbuf);
+            memset(&recbuf,0,sizeof(recbuf));
+            fprintf(stdout,"rec bytes 2: %d\n",numRec);
+        }
+    n = 1;
     }
-    fprintf(stdout,"ok!\n");
-    fclose(fp);
+    //fprintf(stdout,"ok!\n");
     close(sockC);
     return 0;
 }

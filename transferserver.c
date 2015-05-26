@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
   memset(&stbuf,0, sizeof(stbuf));
 
   //accept new connnection
-  sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
+  //sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
 
   //find size of the file to be sent
   fseek(fp, 0L, SEEK_END);
@@ -116,25 +116,27 @@ int main(int argc, char **argv) {
   //set seek back to start
   fseek(fp, 0L, SEEK_SET);
 
-  while(n==0){
+  while(1){
+    fprintf(stdout,"numRead1: %zd\n", numRead);
+    sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
     fseek(fp, 0L, SEEK_SET);
-    fprintf(stdout, "size: %d\n",sz);
     while(x<sz){
       numRead = fread(stbuf, sizeof(char), BUFSIZE, fp); 
       fprintf(stdout, "%s\n", stbuf);
       fprintf(stdout,"file size: %d\n",sz);
-      fprintf(stdout,"numRead: %zd\n", numRead);
+      fprintf(stdout,"numRead2: %zd\n", numRead);
       numSent = send(sockS_new, stbuf, numRead, 0);
       x = x + numSent;
       fprintf(stdout,"total sent: %zd\n",x);
       memset(&stbuf,0, sizeof(stbuf));
       if(x==sz){
-        fprintf(stdout,"hello\n");
+        printf("sockS closed\n");
+        close(sockS_new);
         break;}
     }
-    close(sockS_new);
-    n = 1;
-    
+    x = 0;
+    fprintf(stdout,"numRead3: %zd\n", numRead);
+    //numRead = 0;
   }
   return 0; 
 }
