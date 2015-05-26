@@ -8,7 +8,7 @@
 #include <netdb.h>
 #include <fcntl.h>
  
-#define BUFSIZE 2 //4096 
+#define BUFSIZE 256 //4096 
  
 #define USAGE                                                                 \
 "usage:\n"                                                                    \
@@ -31,9 +31,8 @@ int main(int argc, char **argv) {
     char recbuf[BUFSIZE];
     int numRec;
     int n = 0;
-    int x;
     int enable = 1;
-    size_t numWrite;
+    size_t numWrite, x;
  
     // Parse and set command line arguments
     while ((option_char = getopt(argc, argv, "s:p:o:h")) != -1) {
@@ -73,29 +72,29 @@ int main(int argc, char **argv) {
     bcopy((char *)server->h_addr, (char *)&server_addr.sin_addr.s_addr, server->h_length);
 
     setsockopt(sockC, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
- 
+
+    //connects to server
     connect(sockC, (struct sockaddr *) &server_addr, sizeof(server_addr));
         
- 
-     FILE *fp = fopen(filename,"w");
+    //opens filename and writes
+    FILE *fp = fopen(filename,"w");
 
     memset(&recbuf,0,sizeof(recbuf));
-    //fprintf(stdout,"test");
-    //printf("%d\n",numRec);
-    //numRec = recv(sockC, recbuf, BUFSIZE, 0);
-    fprintf(stdout,"%d\n",numRec);
+
+    //while recv bytes, write into file if, numRec is 0 close socket. 
+    fprintf(stdout,"rec bytes before while: %d\n",numRec);
     while(1){
         numRec = recv(sockC, recbuf, BUFSIZE, 0);
         fprintf(stdout,"rec bytes: %d\n",numRec);
         numWrite = fwrite(recbuf, sizeof(char), numRec, fp);
-        fprintf(stdout, "wrote bytes: %zu\n",numWrite);
+        x = x + numWrite;
+        fprintf(stdout, "total written bytes: %zu\n",x);
         fprintf(stdout, "rec string: %s\n", recbuf);
         memset(&recbuf,0,sizeof(recbuf));
         if(numRec == 0){
             close(sockC);
             break;}
     }
-
     fprintf(stdout,"ok!\n");
     fclose(fp);
     close(sockC);

@@ -41,7 +41,7 @@ struct hostent {
 }
 #endif
  
-#define BUFSIZE 2//4096 
+#define BUFSIZE 256//4096 
  
 #define USAGE                                                                 \
 "usage:\n"                                                                    \
@@ -52,19 +52,17 @@ struct hostent {
 "  -h                  Show this help message\n"                             
  
 int main(int argc, char **argv) {
-  int option_char, bRead;
+  int option_char, sz, sockS, sockS_new;
   int portno = 8888; /* port to listen on */
+  int enable = 1;
+  int n = 0;
+  size_t numRead, numSent;
+  size_t x=0; //keeps track of bytes sent
   char *filename = "bar.txt"; /* file to transfer */
-  int sockS, sockS_new;
+  char stbuf[BUFSIZE]; // buffer
   struct sockaddr_in server_addr, client_addr;
   socklen_t client_len;
-  int enable = 1;
-  char stbuf[BUFSIZE]; // buffer
-  size_t numRead;
-  int n = 0;
-  size_t x=0;
- 
- 
+
   // Parse and set command line arguments
   while ((option_char = getopt(argc, argv, "p:f:h")) != -1){
     switch (option_char) {
@@ -85,9 +83,10 @@ int main(int argc, char **argv) {
   }
  
   /* Socket Code Here */
+
   //open socket for server
   sockS = socket(AF_INET, SOCK_STREAM,0);
-  //printf("%s\n","test" );
+
   //create socket
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = htons(portno);
@@ -102,68 +101,40 @@ int main(int argc, char **argv) {
   //listen
   listen(sockS, 5);
  
-  //printf("%s\n","Server running: waiting for connections.");
-  //sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
-  //  printf("error on accept");
-  
-  //sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
- 
   //open file to transfer
   FILE *fp = fopen(filename,"r");
   
-  //bzero(stbuf, BUFSIZE); //clearing buffer
+  //clearing buffer
   memset(&stbuf,0, sizeof(stbuf));
-    //setsockopt(sockS, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
+
+  //accept new connnection
   sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
-  fprintf(stdout, "beginning to send\n");
-  fprintf(stdout, "numread before: %zd\n",numRead);
+
+  //find size of the file to be sent
+  fseek(fp, 0L, SEEK_END);
+  sz = ftell(fp);
+  //set seek back to start
+  fseek(fp, 0L, SEEK_SET);
+
   while(n==0){
-    fprintf(stdout, "eof1? %d\n",feof(fp));
-    if(numRead==0)
-      break;
-    fprintf(stdout, "!eof!? %d\n",!feof(fp));
-    while(!feof(fp)){
-    //while((numRead = fread(stbuf, sizeof(char), BUFSIZE, fp)) ){
-      numRead = fread(stbuf, sizeof(char), BUFSIZE, fp);
-      //x = x + numRead;
+    fseek(fp, 0L, SEEK_SET);
+    fprintf(stdout, "size: %d\n",sz);
+    while(x<sz){
+      numRead = fread(stbuf, sizeof(char), BUFSIZE, fp); 
       fprintf(stdout, "%s\n", stbuf);
-      fprintf(stdout,"x: %zd\n",x);
+      fprintf(stdout,"file size: %d\n",sz);
       fprintf(stdout,"numRead: %zd\n", numRead);
-      fprintf(stdout, "eof2? %d\n",feof(fp));
-      send(sockS_new, stbuf, numRead, 0);
-      //fprintf(stdout,"sent: %zd\n",send(sockS_new, stbuf, numRead, 0));
+      numSent = send(sockS_new, stbuf, numRead, 0);
+      x = x + numSent;
+      fprintf(stdout,"total sent: %zd\n",x);
       memset(&stbuf,0, sizeof(stbuf));
-      if(feof(fp)){
-        fprintf(stdout, "eof3? %d\n",feof(fp));
-        n = 1;
-        close(sockS_new);}
-      if(numRead==0)
-        break;
+      if(x==sz){
+        fprintf(stdout,"hello\n");
+        break;}
     }
-    // // while(numRead>0){
-    // //   fprintf(stdout,"numread after: %zd\n",numRead);
-    // //   //while bytes read from file returns num byte read >0
-    // //   fprintf(stdout,"%s\n", "eof check");
-    // //   fprintf(stdout, "eof? %d\n",feof(fp));
-    // //   if(feof(fp)){
-    // //       fprintf(stdout, "eoff? %d\n",feof(fp));
-    // //       fprintf(stdout, "%d\n",close(sockS_new));
-    // //       break;}
-    //   //printf("%zd\n",numRead);
-    //   //printf("%s\n", stbuf);
-    //   send(sockS_new, stbuf, numRead, 0);
-    //   fprintf(stdout,"numread after send: %zd\n",numRead);
-    //   memset(&stbuf,0, sizeof(stbuf));
-    // }
-    // if(feof(fp)){
-    //   fprintf(stdout, "eoff? %d\n",feof(fp));
-    //   fprintf(stdout, "%d\n",close(sockS_new));}
-     n = 1;
-    // close(sockS_new);
-    // fprintf(stdout, "ok!\n");
+    close(sockS_new);
+    n = 1;
+    
   }
-  if(feof(fp)){
-    fprintf(stdout, "eof4? %d\n",feof(fp));
-    close(sockS_new);}
   return 0; 
 }
