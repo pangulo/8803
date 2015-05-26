@@ -33,6 +33,7 @@ int main(int argc, char **argv) {
     int n = 0;
     int x;
     int enable = 1;
+    size_t numWrite;
  
     // Parse and set command line arguments
     while ((option_char = getopt(argc, argv, "s:p:o:h")) != -1) {
@@ -79,18 +80,20 @@ int main(int argc, char **argv) {
      FILE *fp = fopen(filename,"w");
 
     memset(&recbuf,0,sizeof(recbuf));
-    fprintf(stdout,"test");
+    //fprintf(stdout,"test");
     //printf("%d\n",numRec);
     //numRec = recv(sockC, recbuf, BUFSIZE, 0);
     fprintf(stdout,"%d\n",numRec);
-    while((numRec = recv(sockC, recbuf, BUFSIZE, 0))){
-        fprintf(stdout,"begin %d\n",numRec);
-        fwrite(recbuf, sizeof(char), numRec, fp);
-        fprintf(stdout, "end %d\n",numRec);
-        fprintf(stdout, "%s\n", recbuf);
+    while(1){
+        numRec = recv(sockC, recbuf, BUFSIZE, 0);
+        fprintf(stdout,"rec bytes: %d\n",numRec);
+        numWrite = fwrite(recbuf, sizeof(char), numRec, fp);
+        fprintf(stdout, "wrote bytes: %zu\n",numWrite);
+        fprintf(stdout, "rec string: %s\n", recbuf);
         memset(&recbuf,0,sizeof(recbuf));
-        if(numRec == 0)
+        if(numRec == 0){
             close(sockC);
+            break;}
     }
 
     fprintf(stdout,"ok!\n");

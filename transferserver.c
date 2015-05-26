@@ -8,7 +8,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
-#include <errno.h>
  
 #if 0
 /* 
@@ -63,6 +62,7 @@ int main(int argc, char **argv) {
   char stbuf[BUFSIZE]; // buffer
   size_t numRead;
   int n = 0;
+  size_t x=0;
  
  
   // Parse and set command line arguments
@@ -116,37 +116,54 @@ int main(int argc, char **argv) {
     //setsockopt(sockS, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
   sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
   fprintf(stdout, "beginning to send\n");
-  while((numRead = fread(stbuf, sizeof(char), BUFSIZE, fp))){
-    //while bytes read from file returns num byte read >0
-    fprintf(stdout,"%s\n", "eof check");
-    if(feof(fp)){
-        fprintf(stdout, "eof? %d\n",feof(fp));
-        fprintf(stdout, "%d\n",close(sockS_new));}
-    //printf("%zd\n",numRead);
-    //printf("%s\n", stbuf);
-    send(sockS_new, stbuf, numRead, 0);
-
-      
-
-    //printf("errno: %d\n", errno);
-
-      //printf("bytes sent %zd\n",send(sockS_new, stbuf, numRead, 0));
-
-        //shutdown(sockS_new,1);
-        //break;
-      //printf("%s\n", stbuf);
-      //  printf("Failed to send file");
-      //bzero(stbuf, BUFSIZE);//clear buffer
+  fprintf(stdout, "numread before: %zd\n",numRead);
+  while(n==0){
+    fprintf(stdout, "eof1? %d\n",feof(fp));
+    if(numRead==0)
+      break;
+    fprintf(stdout, "!eof!? %d\n",!feof(fp));
+    while(!feof(fp)){
+    //while((numRead = fread(stbuf, sizeof(char), BUFSIZE, fp)) ){
+      numRead = fread(stbuf, sizeof(char), BUFSIZE, fp);
+      //x = x + numRead;
+      fprintf(stdout, "%s\n", stbuf);
+      fprintf(stdout,"x: %zd\n",x);
+      fprintf(stdout,"numRead: %zd\n", numRead);
+      fprintf(stdout, "eof2? %d\n",feof(fp));
+      send(sockS_new, stbuf, numRead, 0);
+      //fprintf(stdout,"sent: %zd\n",send(sockS_new, stbuf, numRead, 0));
       memset(&stbuf,0, sizeof(stbuf));
-      // if(numRead < 0){
-      //   break;}
-      // else if(numRead == 0){
-      //   break;}
+      if(feof(fp)){
+        fprintf(stdout, "eof3? %d\n",feof(fp));
+        n = 1;
+        close(sockS_new);}
+      if(numRead==0)
+        break;
+    }
+    // // while(numRead>0){
+    // //   fprintf(stdout,"numread after: %zd\n",numRead);
+    // //   //while bytes read from file returns num byte read >0
+    // //   fprintf(stdout,"%s\n", "eof check");
+    // //   fprintf(stdout, "eof? %d\n",feof(fp));
+    // //   if(feof(fp)){
+    // //       fprintf(stdout, "eoff? %d\n",feof(fp));
+    // //       fprintf(stdout, "%d\n",close(sockS_new));
+    // //       break;}
+    //   //printf("%zd\n",numRead);
+    //   //printf("%s\n", stbuf);
+    //   send(sockS_new, stbuf, numRead, 0);
+    //   fprintf(stdout,"numread after send: %zd\n",numRead);
+    //   memset(&stbuf,0, sizeof(stbuf));
+    // }
+    // if(feof(fp)){
+    //   fprintf(stdout, "eoff? %d\n",feof(fp));
+    //   fprintf(stdout, "%d\n",close(sockS_new));}
+     n = 1;
+    // close(sockS_new);
+    // fprintf(stdout, "ok!\n");
   }
-    close(sockS_new);
-  fprintf(stdout, "ok!\n");
-    //printf("%d\n",shutdown(sockS_new,1));
-  //printf("%s\n", "test");
-  close(sockS_new);
-  return 0;
+  if(feof(fp)){
+    fprintf(stdout, "eof4? %d\n",feof(fp));
+    close(sockS_new);}
+  return 0; 
 }
