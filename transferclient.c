@@ -29,9 +29,10 @@ int main(int argc, char **argv) {
     struct hostent *server;
     int sockC;
     char recbuf[BUFSIZE];
-    int numRec = 0;
+    int numRec;
     int n = 0;
     int x;
+    int enable = 1;
  
     // Parse and set command line arguments
     while ((option_char = getopt(argc, argv, "s:p:o:h")) != -1) {
@@ -60,9 +61,7 @@ int main(int argc, char **argv) {
  
     //open socket for client
     sockC = socket(AF_INET, SOCK_STREAM, 0);
-    //if (sockC<0)
-    //    printf("error opening socket");
- 
+
     //set value of server_addr to 0
     memset(&server_addr, 0, sizeof(server_addr));
  
@@ -71,48 +70,31 @@ int main(int argc, char **argv) {
     server_addr.sin_port = htons(portno);
     //copies length bytes from h_addr to s_addr.
     bcopy((char *)server->h_addr, (char *)&server_addr.sin_addr.s_addr, server->h_length);
+
+    setsockopt(sockC, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
  
     connect(sockC, (struct sockaddr *) &server_addr, sizeof(server_addr));
-    //    printf("error with connection");
+        
  
      FILE *fp = fopen(filename,"w");
 
-     //       printf("error opening file");
-     
-     //printf("test\n");
-     //if(fp =! NULL){
-    //numRec = recv(sockC, recbuf, BUFSIZE, 0);
-    //printf("%d\n",numRec);
     memset(&recbuf,0,sizeof(recbuf));
-    
-    printf("%d\n",numRec);
-    while((numRec = recv(sockC, recbuf, BUFSIZE, 0))){
-        printf("%d\n",numRec);
-        fwrite(recbuf, sizeof(char), numRec, fp);
-        printf("%d\n",numRec);
-        printf("%s", recbuf);
-        memset(&recbuf,0,sizeof(recbuf));
-
-   //     printf("%d\n",numRec);
-        //while num of bytes received is > 0
-   //     printf("test3\n");
-   //     printf("%d\n",numRec);
-   //     printf("%s\n", recbuf);
-//        fwrite(recbuf, sizeof(char), numRec, fp);
-//        memset(&recbuf,0,sizeof(recbuf));
-        //memset(&recbuf,0,sizeof(recbuf));
-   //     printf("%d\n",numRec);
-        //numRec = 0;
-        // if(numRec < 0){
-        //     break;}
-        // else if(numRec == 0){
-        //     break;}
-    }
+    fprintf(stdout,"test");
     //printf("%d\n",numRec);
-    printf("ok!\n");
-    //n = 1;
- //   fclose(fp);
-     //}
-close(sockC);
-return 0;
+    //numRec = recv(sockC, recbuf, BUFSIZE, 0);
+    fprintf(stdout,"%d\n",numRec);
+    while((numRec = recv(sockC, recbuf, BUFSIZE, 0))){
+        fprintf(stdout,"begin %d\n",numRec);
+        fwrite(recbuf, sizeof(char), numRec, fp);
+        fprintf(stdout, "end %d\n",numRec);
+        fprintf(stdout, "%s\n", recbuf);
+        memset(&recbuf,0,sizeof(recbuf));
+        if(numRec == 0)
+            close(sockC);
+    }
+
+    fprintf(stdout,"ok!\n");
+    fclose(fp);
+    close(sockC);
+    return 0;
 }

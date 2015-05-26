@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
   socklen_t client_len;
   int enable = 1;
   char stbuf[BUFSIZE]; // buffer
-  int numRead;
+  size_t numRead;
   int n = 0;
  
  
@@ -105,44 +105,48 @@ int main(int argc, char **argv) {
   //printf("%s\n","Server running: waiting for connections.");
   //sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
   //  printf("error on accept");
+  
+  //sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
  
   //open file to transfer
   FILE *fp = fopen(filename,"r");
   
   //bzero(stbuf, BUFSIZE); //clearing buffer
   memset(&stbuf,0, sizeof(stbuf));
-  while(n == 0){
-    sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
-    while((numRead = fread(stbuf, sizeof(char), BUFSIZE, fp))){
-      //while bytes read from file returns num byte read >0
-        printf("%d\n",numRead);
-        printf("%s\n", stbuf);
+    //setsockopt(sockS, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
+  sockS_new = accept(sockS, (struct sockaddr *) &client_addr, &client_len);
+  fprintf(stdout, "beginning to send\n");
+  while((numRead = fread(stbuf, sizeof(char), BUFSIZE, fp))){
+    //while bytes read from file returns num byte read >0
+    fprintf(stdout,"%s\n", "eof check");
+    if(feof(fp)){
+        fprintf(stdout, "eof? %d\n",feof(fp));
+        fprintf(stdout, "%d\n",close(sockS_new));}
+    //printf("%zd\n",numRead);
+    //printf("%s\n", stbuf);
+    send(sockS_new, stbuf, numRead, 0);
 
-        if(feof(fp)){
-          printf("eof\n");
-          printf("%d\n",feof(fp));
-          printf("%d\n",close(sockS_new));}
-        printf("%d\n", errno);
-        send(sockS_new, stbuf, numRead, 0);
+      
 
-          //shutdown(sockS_new,1);
-          //break;
-        //printf("%s\n", stbuf);
-        //  printf("Failed to send file");
-        //bzero(stbuf, BUFSIZE);//clear buffer
-        memset(&stbuf,0, sizeof(stbuf));
-        // if(numRead < 0){
-        //   break;}
-        // else if(numRead == 0){
-        //   break;}
-    }
+    //printf("errno: %d\n", errno);
 
-    printf("ok!\n");
-    //printf("%d\n",shutdown(sockS_new,1));
-    n = 1;
+      //printf("bytes sent %zd\n",send(sockS_new, stbuf, numRead, 0));
+
+        //shutdown(sockS_new,1);
+        //break;
+      //printf("%s\n", stbuf);
+      //  printf("Failed to send file");
+      //bzero(stbuf, BUFSIZE);//clear buffer
+      memset(&stbuf,0, sizeof(stbuf));
+      // if(numRead < 0){
+      //   break;}
+      // else if(numRead == 0){
+      //   break;}
   }
+    close(sockS_new);
+  fprintf(stdout, "ok!\n");
+    //printf("%d\n",shutdown(sockS_new,1));
   //printf("%s\n", "test");
   close(sockS_new);
   return 0;
- 
 }
