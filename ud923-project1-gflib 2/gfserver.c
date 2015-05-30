@@ -8,14 +8,13 @@
 
 ssize_t gfs_sendheader(gfcontext_t *ctx, gfstatus_t status, size_t file_len){
 	char message[256];
-
 	if(status == 400 /*&& file_len =0 ?*/){
-		message = "GETFILE GF_FILE_NOT_FOUND";
 		//snprintf(messge, sizeof(messge), "%zu", status);
 		//fprintf(stdout, "GETFILE GF_FILE_NOT_FOUND");
 		//fflush(stdout)
-		send(ctx,message, sizeof(message));
+		send(ctx,"GETFILE GF_FILE_NOT_FOUND", sizeof(message));
 	}
+	return  0;
 
 }
 
